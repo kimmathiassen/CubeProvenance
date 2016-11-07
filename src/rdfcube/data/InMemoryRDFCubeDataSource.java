@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
@@ -24,15 +24,15 @@ public class InMemoryRDFCubeDataSource implements RDFCubeDataSource {
 
 	private Set<Quadruple<String, String, String, String>> data;
 	
-	private MultiMap subject2Tuple;
+	private MultiValuedMap<String, Quadruple<String, String, String, String>> subject2Tuple;
 	
-	private MultiMap object2Tuple;
+	private MultiValuedMap<String, Quadruple<String, String, String, String>> object2Tuple;
 	
 	
 	private InMemoryRDFCubeDataSource() {
 		data = new LinkedHashSet<>();
-		subject2Tuple = new MultiValueMap();
-		object2Tuple = new MultiValueMap();
+		subject2Tuple = new HashSetValuedHashMap<>();
+		object2Tuple = new HashSetValuedHashMap<>();
 	}
 	
 	/**
@@ -66,16 +66,6 @@ public class InMemoryRDFCubeDataSource implements RDFCubeDataSource {
 	@Override
 	public Iterator<Quadruple<String, String, String, String>> iterator() {
 		return data.iterator();
-	}
-
-	@Override
-	public Iterable<Quadruple<String, String, String, String>> getQuadsPerSubject(String subject) {
-		return (Iterable<Quadruple<String, String, String, String>>) subject2Tuple.get(subject);
-	}
-
-	@Override
-	public Iterable<Quadruple<String, String, String, String>> getQuadsPerObject(String object) {
-		return (Iterable<Quadruple<String, String, String, String>>) object2Tuple.get(object);
 	}
 	
 }

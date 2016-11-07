@@ -12,6 +12,7 @@
 :obs2	w:ip	:125.12.3.21	:A
 :obs2	w:user	w:lgalarra	:A
 :obs2	w:time	:01.01.2016-12h05	:A
+:125.12.3.21	rdf:type	IP	:ETL
 w:OLAP	w:wikipedia	w:English	:ETL
 w:OLAP	w:articleTitle	OLAP	:A
 w:RDF_Cubes	w:wikipedia	w:English	:ETL
