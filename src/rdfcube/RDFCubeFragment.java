@@ -41,6 +41,7 @@ public abstract class RDFCubeFragment {
 	
 	public abstract boolean isMetadata();
 	
+	
 	public boolean hasSignature(Quadruple<String, String, String, String> signature) {
 		return signatures.contains(signature);
 	}
