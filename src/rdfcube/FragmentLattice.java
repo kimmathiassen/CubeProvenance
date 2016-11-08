@@ -239,5 +239,10 @@ public class FragmentLattice implements Iterable<RDFCubeFragment>{
 			
 		};
 	}
+
+
+	public int size() {
+		return parentsGraph.size() + 1;
+	}
 		
 }
