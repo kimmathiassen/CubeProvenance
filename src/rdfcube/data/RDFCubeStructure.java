@@ -1,4 +1,4 @@
-package rdfcube;
+package rdfcube.data;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,13 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
+
+import rdfcube.DimensionHierarchy;
 
 public class RDFCubeStructure {
 	
@@ -24,7 +26,7 @@ public class RDFCubeStructure {
 	
 	private Set<String> measures;
 	
-	private MultiMap levelAttributes;
+	private MultiValuedMap<String, String> levelAttributes;
 	
 	private Map<String, DimensionHierarchy> dimensions;
 	
@@ -57,7 +59,7 @@ public class RDFCubeStructure {
 		factualRelations = new LinkedHashSet<>();
 		cubeRelations = new LinkedHashSet<>();
 		measures = new LinkedHashSet<>();
-		levelAttributes = new MultiValueMap();
+		levelAttributes = new HashSetValuedHashMap<>();
 		dimensions = new HashMap<>();
 		domains = new HashMap<>();
 		ranges = new HashMap<>();
@@ -187,7 +189,7 @@ public class RDFCubeStructure {
 		return new MutablePair<>(domains.get(relation), ranges.get(relation));
 	}
 
-	public boolean isCubeRelation(String relation) {
+	public boolean isMetadataRelation(String relation) {
 		return cubeRelations.contains(relation);
 	}
 	

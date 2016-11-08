@@ -3,64 +3,50 @@ package rdfcube;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Triple;
+import rdfcube.types.Quadruple;
 
-public class RDFCubeFragment {
+public abstract class RDFCubeFragment {
 
 	// Fragment definition
-	private Set<Triple<String, String, String>> relationSignatures;
-	
-	private Set<String> provenanceIds;
-	
-	private boolean cubePartition;
+	private Set<Quadruple<String, String, String, String>> signatures;
 	
 	private long size;
 	
 	private boolean root;
 	
-	public RDFCubeFragment() {
-		relationSignatures = new LinkedHashSet<>();
-		provenanceIds = new LinkedHashSet<>();
+	protected RDFCubeFragment() {
+		signatures = new LinkedHashSet<>();
+		signatures.add(new Quadruple<String, String, String, String>(null, null, null, null));
 		root = true;
 		size = 0;
 	}
 	
-	public RDFCubeFragment(Triple<String, String, String> relationSignature, String provenanceId, boolean isCubePartition) {
-		relationSignatures = new LinkedHashSet<>();
-		provenanceIds = new LinkedHashSet<>();
-		relationSignatures.add(relationSignature);
-		provenanceIds.add(provenanceId);
-		setCubePartition(isCubePartition);
+	protected RDFCubeFragment(Quadruple<String, String, String, String> signature) {
+		signatures = new LinkedHashSet<>();
+		signatures.add(signature);
 		root = false;
 		size = 0;
 	}
 	
-	public RDFCubeFragment(String provenanceId) {
-		relationSignatures = new LinkedHashSet<>();
-		provenanceIds = new LinkedHashSet<>();
-		provenanceIds.add(provenanceId);
+	protected RDFCubeFragment(String provenanceId) {
+		signatures = new LinkedHashSet<>();
+		signatures.add(new Quadruple<String, String, String, String>(null, null, null, provenanceId));
 		root = false;
 		size = 0;		
-	}
-
-	public boolean isCubePartition() {
-		return cubePartition;
-	}
-
-	public void setCubePartition(boolean cubePartition) {
-		this.cubePartition = cubePartition;
 	}
 	
 	public boolean isRoot() {
 		return root;
 	}
 	
-	public boolean hasSignature(Triple<String, String, String> relation, String provenanceId) {
-		if (relation == null) {
-			return relationSignatures.isEmpty() && provenanceIds.contains(provenanceId);
-		} else {
-			return relationSignatures.contains(relation) && provenanceIds.contains(provenanceId);
-		}
+	public abstract boolean isMetadata();
+	
+	public boolean hasSignature(Quadruple<String, String, String, String> signature) {
+		return signatures.contains(signature);
+	}
+	
+	public Quadruple<String, String, String, String> getFirstSignature() {
+		return signatures.iterator().next();
 	}
 	
 	public long size() {
@@ -70,13 +56,12 @@ public class RDFCubeFragment {
 	public void increaseSize() {
 		++size;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((provenanceIds == null) ? 0 : provenanceIds.hashCode());
-		result = prime * result + ((relationSignatures == null) ? 0 : relationSignatures.hashCode());
+		result = prime * result + ((signatures == null) ? 0 : signatures.hashCode());
 		return result;
 	}
 
@@ -89,25 +74,20 @@ public class RDFCubeFragment {
 		if (getClass() != obj.getClass())
 			return false;
 		RDFCubeFragment other = (RDFCubeFragment) obj;
-		if (provenanceIds == null) {
-			if (other.provenanceIds != null)
+		if (signatures == null) {
+			if (other.signatures != null)
 				return false;
-		} else if (!provenanceIds.equals(other.provenanceIds))
-			return false;
-		if (relationSignatures == null) {
-			if (other.relationSignatures != null)
-				return false;
-		} else if (!relationSignatures.equals(other.relationSignatures))
+		} else if (!signatures.equals(other.signatures))
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (root)
 			return "[All, " +  size + " triples]";
 		else
-			return "[" + relationSignatures +  " " + provenanceIds + "  " + size + " triples]"; 
+			return "[" + signatures + "  " + size + " triples]"; 
 	}
 
 }
