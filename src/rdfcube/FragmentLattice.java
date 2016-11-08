@@ -1,26 +1,22 @@
 package rdfcube;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.MultiMap;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
-import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 
 import rdfcube.data.InMemoryRDFCubeDataSource;
 import rdfcube.data.RDFCubeDataSource;
+import rdfcube.data.RDFCubeStructure;
 import rdfcube.types.Quadruple;
 
-public class PartitionLattice implements Iterable<RDFCubeFragment>{
+public class FragmentLattice implements Iterable<RDFCubeFragment>{
 	
 	/**
 	 * Root fragment, i.e., ancestor of all fragments in the lattice.
@@ -71,7 +67,7 @@ public class PartitionLattice implements Iterable<RDFCubeFragment>{
 	private MultiValuedMap<String, RDFCubeFragment> partitionsRangeOfSignatureMap;
 		
 	
-	private PartitionLattice(RDFCubeFragment root, RDFCubeStructure schema, RDFCubeDataSource data) {
+	FragmentLattice(RDFCubeFragment root, RDFCubeStructure schema, RDFCubeDataSource data) {
 		this.root = root;
 		this.structure = schema;
 		this.data = data;
@@ -83,29 +79,8 @@ public class PartitionLattice implements Iterable<RDFCubeFragment>{
 		partitionsRangeOfSignatureMap = new HashSetValuedHashMap<>();
 	}
 	
-	/**
-	 * Builds a partition lattice from the schema and the triples of an RDF data cube
-	 * @param schemaPath
-	 * @param dataPath
-	 * @return
-	 */
-	public static PartitionLattice build(RDFCubeStructure schema, RDFCubeDataSource data) {
-		RDFCubeFragment root = createFragment(); 
-		PartitionLattice lattice = new PartitionLattice(root, schema, data);
-		
-		Iterator<Quadruple<String, String, String, String>> iterator = data.iterator();
-		// Register all the triples in the fragments
-		while (iterator.hasNext()) {
-			lattice.registerTuple(iterator.next());
-		}
-		
-		// Create the metadata relations between the fragments
-		lattice.linkData2MetadataFragments();
-			
-		return lattice;
-	}
 	
-	private void linkData2MetadataFragments() {
+	void linkData2MetadataFragments() {
 		for (RDFCubeFragment fragment : parentsGraph.keySet()) {
 			Set<RDFCubeFragment> ancestors = getAncestors(fragment);
 			if (!fragment.isMetadata()) {
@@ -145,7 +120,7 @@ public class PartitionLattice implements Iterable<RDFCubeFragment>{
 	 * Returns an RDF Data fragment which can be used as the root for a fragment lattice.
 	 * @return
 	 */
-	private static RDFCubeFragment createFragment() {
+	static RDFCubeFragment createFragment() {
 		return new RDFCubeDataFragment();
 	}
 	
@@ -178,7 +153,7 @@ public class PartitionLattice implements Iterable<RDFCubeFragment>{
 		
 	}
 	
-	private void registerTuple(Quadruple<String, String, String, String> quad) {
+	void registerTuple(Quadruple<String, String, String, String> quad) {
 		root.increaseSize();
 		String provenanceIdentifier = quad.getFourth();
 		
@@ -225,13 +200,13 @@ public class PartitionLattice implements Iterable<RDFCubeFragment>{
 	
 
 	public static void main(String[] args) throws IOException {
-		RDFCubeDataSource source = 
+		RDFCubeDataSource data = 
 				InMemoryRDFCubeDataSource.build("/home/galarraga/workspace/CubeProvenance/input/wikipedia.cube.tsv");
 		RDFCubeStructure schema = 
 				RDFCubeStructure.build("/home/galarraga/workspace/CubeProvenance/input/wikipedia.schema.tsv");
-		PartitionLattice lattice = PartitionLattice.build(schema, source);
+		ExampleFragmentLatticeBuilder builder = new ExampleFragmentLatticeBuilder();
+		FragmentLattice lattice = builder.build(data, schema);
 		System.out.println(lattice);
-
 	}
 
 	@Override

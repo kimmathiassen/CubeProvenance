@@ -1,4 +1,4 @@
-package rdfcube;
+package rdfcube.data;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,6 +15,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
+
+import rdfcube.DimensionHierarchy;
 
 public class RDFCubeStructure {
 	
